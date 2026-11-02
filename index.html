@@ -639,36 +639,39 @@ function compareReports() {
     const second = flatten(other);
 
     const paths = new Set([
-        ...Object.keys(first),
-        ...Object.keys(second)
-    ]);
+    ...Object.keys(first),
+    ...Object.keys(second)
+]);
 
-    comparison = [];
+comparison = [];
 
-    for (const path of paths) {
-        const hasFirst = Object.hasOwn(first, path);
-        const hasSecond = Object.hasOwn(second, path);
-
-        let status;
-
-        if (!hasFirst || !hasSecond) {
-            status = "missing";
-        } else if (
-            stableStringify(first[path]) ===
-            stableStringify(second[path])
-        ) {
-            status = "same";
-        } else {
-            status = "different";
-        }
-
-        comparison.push({
-            path,
-            status,
-            first: first[path],
-            second: second[path]
-        });
+for (const path of paths) {
+    const hasFirst = Object.hasOwn(first, path);
+    const hasSecond = Object.hasOwn(second, path);
+    
+    // تجاهل الخصائص الغائبة من التقريرين
+    if (!hasFirst && !hasSecond) continue;
+    
+    let status;
+    
+    if (!hasFirst || !hasSecond) {
+        status = "missing";
+    } else if (
+        stableStringify(first[path]) ===
+        stableStringify(second[path])
+    ) {
+        status = "same";
+    } else {
+        status = "different";
     }
+    
+    comparison.push({
+        path,
+        status,
+        first: first[path],
+        second: second[path]
+    });
+}
 
     const counts = {
         same: comparison.filter(x => x.status === "same").length,
@@ -763,3 +766,4 @@ refreshData();
 
 </body>
 </html>
+
