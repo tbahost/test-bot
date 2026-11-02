@@ -1,1245 +1,1247 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#10151d">
-<title>Device Inspector</title>
-
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<style>
-:root {
-    --bg: var(--tg-theme-bg-color, #10151d);
-    --card: var(--tg-theme-secondary-bg-color, #1a2330);
-    --text: var(--tg-theme-text-color, #e8edf5);
-    --hint: var(--tg-theme-hint-color, #929eaf);
-    --accent: var(--tg-theme-button-color, #ff7500);
-    --border: rgba(128, 128, 128, .2);
-    --green: #22c55e;
-    --red: #ef4444;
-    --yellow: #eab308;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    padding: 16px;
-    background: var(--bg);
-    color: var(--text);
-    font-family: Arial, sans-serif;
-    font-size: 14px;
-}
-
-header {
-    margin-bottom: 20px;
-}
-
-.app-heading {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
-
-h1 {
-    font-size: 21px;
-    margin: 0;
-}
-
-#app-version {
-    direction: ltr;
-    font-size: 11px;
-    padding: 4px 7px;
-    border-radius: 6px;
-    color: var(--hint);
-    background: var(--card);
-}
-
-.subtitle {
-    color: var(--hint);
-    font-size: 12px;
-    margin-top: 7px;
-}
-
-.section {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 13px;
-    margin-bottom: 13px;
-}
-
-.section-title {
-    font-size: 15px;
-    font-weight: bold;
-    margin-bottom: 12px;
-}
-
-.data-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-}
-
-.field {
-    min-width: 0;
-    padding: 9px;
-    border-radius: 8px;
-    background: rgba(128, 128, 128, .07);
-}
-
-.field.wide {
-    grid-column: 1 / -1;
-}
-
-.field-name {
-    color: var(--hint);
-    font-size: 11px;
-    margin-bottom: 6px;
-}
-
-.field-value {
-    direction: ltr;
-    text-align: left;
-    overflow-wrap: anywhere;
-    white-space: pre-wrap;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-button {
-    border: 0;
-    border-radius: 9px;
-    padding: 11px 13px;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-    background: var(--accent);
-    color: white;
-}
-
-button:disabled {
-    opacity: .5;
-    cursor: wait;
-}
-
-.buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-button.secondary {
-    background: var(--card);
-    color: var(--text);
-    border: 1px solid var(--border);
-}
-
-textarea {
-    width: 100%;
-    min-height: 130px;
-    resize: vertical;
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    padding: 11px;
-    background: var(--card);
-    color: var(--text);
-    direction: ltr;
-    text-align: left;
-    font-family: monospace;
-    font-size: 12px;
-}
-
-.status {
-    color: var(--hint);
-    font-size: 12px;
-    margin: 10px 0;
-    overflow-wrap: anywhere;
-}
-
-.result-row {
-    padding: 10px;
-    border-bottom: 1px solid var(--border);
-}
-
-.result-row:last-child {
-    border-bottom: 0;
-}
-
-.result-path {
-    direction: ltr;
-    text-align: left;
-    overflow-wrap: anywhere;
-    font-size: 12px;
-    margin-bottom: 7px;
-    color: var(--hint);
-}
-
-.result-values {
-    direction: ltr;
-    text-align: left;
-    overflow-wrap: anywhere;
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.same { color: var(--green); }
-.different { color: var(--red); }
-.missing { color: var(--yellow); }
-
-.hidden {
-    display: none;
-}
-
-@media (max-width: 360px) {
-    .data-grid {
-        grid-template-columns: 1fr;
-    }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#10151d">
+    <title>Device Inspector</title>
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        :root {
+            --bg: var(--tg-theme-bg-color, #10151d);
+            --card: var(--tg-theme-secondary-bg-color, #1a2330);
+            --text: var(--tg-theme-text-color, #e8edf5);
+            --hint: var(--tg-theme-hint-color, #929eaf);
+            --accent: var(--tg-theme-button-color, #ff7500);
+            --border: rgba(128, 128, 128, .2);
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #eab308;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            margin: 0;
+            padding: 16px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+        
+        header {
+            margin-bottom: 20px;
+        }
+        
+        .app-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        
+        h1 {
+            font-size: 21px;
+            margin: 0;
+        }
+        
+        #app-version {
+            direction: ltr;
+            font-size: 11px;
+            padding: 4px 7px;
+            border-radius: 6px;
+            color: var(--hint);
+            background: var(--card);
+        }
+        
+        .subtitle {
+            color: var(--hint);
+            font-size: 12px;
+            margin-top: 7px;
+        }
+        
+        .section {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 13px;
+            margin-bottom: 13px;
+        }
+        
+        .section-title {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+        
+        .field {
+            min-width: 0;
+            padding: 9px;
+            border-radius: 8px;
+            background: rgba(128, 128, 128, .07);
+        }
+        
+        .field.wide {
+            grid-column: 1 / -1;
+        }
+        
+        .field-name {
+            color: var(--hint);
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+        
+        .field-value {
+            direction: ltr;
+            text-align: left;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        
+        button {
+            border: 0;
+            border-radius: 9px;
+            padding: 11px 13px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            background: var(--accent);
+            color: white;
+        }
+        
+        button:disabled {
+            opacity: .5;
+            cursor: wait;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        
+        button.secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 130px;
+            resize: vertical;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 11px;
+            background: var(--card);
+            color: var(--text);
+            direction: ltr;
+            text-align: left;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .status {
+            color: var(--hint);
+            font-size: 12px;
+            margin: 10px 0;
+            overflow-wrap: anywhere;
+        }
+        
+        .result-row {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .result-row:last-child {
+            border-bottom: 0;
+        }
+        
+        .result-path {
+            direction: ltr;
+            text-align: left;
+            overflow-wrap: anywhere;
+            font-size: 12px;
+            margin-bottom: 7px;
+            color: var(--hint);
+        }
+        
+        .result-values {
+            direction: ltr;
+            text-align: left;
+            overflow-wrap: anywhere;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .same {
+            color: var(--green);
+        }
+        
+        .different {
+            color: var(--red);
+        }
+        
+        .missing {
+            color: var(--yellow);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 360px) {
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
-
-<header>
-    <div class="app-heading">
-        <h1>Device Inspector</h1>
-        <span id="app-version"></span>
-    </div>
-    <div class="subtitle">
-        Telegram Mini App · Environment Diagnostics
-    </div>
-</header>
-
-<div class="buttons">
-    <button id="refreshBtn">تحديث البيانات</button>
-    <button id="copyBtn" class="secondary">نسخ التقرير</button>
-</div>
-
-<div id="status" class="status">جاري التحضير...</div>
-
-<div id="output"></div>
-
-<section class="section">
-    <div class="section-title">مقارنة تقريرين</div>
-    <div class="field-name">
-        الصق هنا تقرير JSON من جلسة أخرى
-    </div>
-    <textarea id="compareInput" placeholder="Paste JSON report here..."></textarea>
-
+    
+    <header>
+        <div class="app-heading">
+            <h1>Device Inspector</h1>
+            <span id="app-version"></span>
+        </div>
+        <div class="subtitle">
+            Telegram Mini App · Environment Diagnostics
+        </div>
+    </header>
+    
     <div class="buttons">
-        <button id="compareBtn">مقارنة التقريرين</button>
-        <button id="clearBtn" class="secondary">مسح</button>
+        <button id="refreshBtn">تحديث البيانات</button>
+        <button id="copyBtn" class="secondary">نسخ التقرير</button>
     </div>
-
-    <div id="compareSummary" class="status"></div>
-    <div id="compareOutput"></div>
-</section>
-
-<script>
-"use strict";
-
-/* =========================
-   APP VERSION
-========================= */
-
-const APP_VERSION = "1.0.0";
-
-document.getElementById("app-version").textContent =
-    "v" + APP_VERSION;
-
-
-/* =========================
-   TELEGRAM
-========================= */
-
-const tg = window.Telegram?.WebApp;
-
-try {
-    tg?.ready();
-    tg?.expand();
-} catch (_) {}
-
-
-/* =========================
-   HELPERS
-========================= */
-
-const $ = id => document.getElementById(id);
-
-function safe(fn, fallback = null) {
-    try {
-        return fn();
-    } catch (e) {
-        return fallback;
-    }
-}
-
-function errorInfo(e) {
-    return {
-        error: e?.message || String(e)
-    };
-}
-
-function hashString(str) {
-    let hash = 2166136261;
-
-    for (let i = 0; i < str.length; i++) {
-        hash ^= str.charCodeAt(i);
-        hash = Math.imul(hash, 16777619);
-    }
-
-    return (hash >>> 0).toString(16).padStart(8, "0");
-}
-
-function hashBytes(bytes) {
-    let hash = 2166136261;
-
-    for (const byte of bytes) {
-        hash ^= byte;
-        hash = Math.imul(hash, 16777619);
-    }
-
-    return (hash >>> 0).toString(16).padStart(8, "0");
-}
-
-function stableStringify(value) {
-    if (value === undefined) return "undefined";
-
-    if (value === null || typeof value !== "object") {
-        return JSON.stringify(value);
-    }
-
-    if (Array.isArray(value)) {
-        return "[" + value.map(stableStringify).join(",") + "]";
-    }
-
-    const keys = Object.keys(value).sort();
-
-    return "{" + keys.map(key =>
-        JSON.stringify(key) + ":" + stableStringify(value[key])
-    ).join(",") + "}";
-}
-
-function cleanObject(obj) {
-    if (!obj || typeof obj !== "object") return obj;
-
-    const result = {};
-
-    for (const [key, value] of Object.entries(obj)) {
-        if (
-            value === undefined ||
-            /^(hash|signature|query_id|auth_date|initData)$/i.test(key)
-        ) continue;
-
-        if (value && typeof value === "object") {
-            result[key] = cleanObject(value);
-        } else {
-            result[key] = value;
+    
+    <div id="status" class="status">جاري التحضير...</div>
+    
+    <div id="output"></div>
+    
+    <section class="section">
+        <div class="section-title">مقارنة تقريرين</div>
+        <div class="field-name">
+            الصق هنا تقرير JSON من جلسة أخرى
+        </div>
+        <textarea id="compareInput" placeholder="Paste JSON report here..."></textarea>
+        
+        <div class="buttons">
+            <button id="compareBtn">مقارنة التقريرين</button>
+            <button id="clearBtn" class="secondary">مسح</button>
+        </div>
+        
+        <div id="compareSummary" class="status"></div>
+        <div id="compareOutput"></div>
+    </section>
+    
+    <script>
+        "use strict";
+        
+        /* =========================
+           APP VERSION
+        ========================= */
+        
+        const APP_VERSION = "1.0.0";
+        
+        document.getElementById("app-version").textContent =
+            "v" + APP_VERSION;
+        
+        
+        /* =========================
+           TELEGRAM
+        ========================= */
+        
+        const tg = window.Telegram?.WebApp;
+        
+        try {
+            tg?.ready();
+            tg?.expand();
+        } catch (_) {}
+        
+        
+        /* =========================
+           HELPERS
+        ========================= */
+        
+        const $ = id => document.getElementById(id);
+        
+        function safe(fn, fallback = null) {
+            try {
+                return fn();
+            } catch (e) {
+                return fallback;
+            }
         }
-    }
-
-    return result;
-}
-
-
-/* =========================
-   BASIC DEVICE DATA
-========================= */
-
-function getDeviceData() {
-    return {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        vendor: navigator.vendor,
-        language: navigator.language,
-        languages: navigator.languages,
-        hardwareConcurrency: navigator.hardwareConcurrency,
-        deviceMemory: navigator.deviceMemory ?? null,
-        maxTouchPoints: navigator.maxTouchPoints,
-        cookieEnabled: navigator.cookieEnabled,
-        online: navigator.onLine,
-        webdriver: navigator.webdriver ?? null,
-        pdfViewerEnabled: navigator.pdfViewerEnabled ?? null
-    };
-}
-
-
-/* =========================
-   SCREEN
-========================= */
-
-function getScreenData() {
-    return {
-        width: screen.width,
-        height: screen.height,
-        availWidth: screen.availWidth,
-        availHeight: screen.availHeight,
-        colorDepth: screen.colorDepth,
-        pixelDepth: screen.pixelDepth,
-        devicePixelRatio: window.devicePixelRatio,
-        innerWidth: window.innerWidth,
-        innerHeight: window.innerHeight,
-        outerWidth: window.outerWidth,
-        outerHeight: window.outerHeight,
-        orientation: screen.orientation?.type ?? null
-    };
-}
-
-
-/* =========================
-   BROWSER / WEBVIEW
-========================= */
-
-function getBrowserData() {
-    return {
-        language: navigator.language,
-        languages: navigator.languages,
-        timezone: safe(() =>
-            Intl.DateTimeFormat().resolvedOptions().timeZone
-        ),
-        timezoneOffset: new Date().getTimezoneOffset(),
-        localStorage: safe(() => {
-            const key = "__inspector_test__";
-            localStorage.setItem(key, "1");
-            localStorage.removeItem(key);
-            return true;
-        }, false),
-        sessionStorage: safe(() => {
-            const key = "__inspector_test__";
-            sessionStorage.setItem(key, "1");
-            sessionStorage.removeItem(key);
-            return true;
-        }, false),
-        serviceWorker: "serviceWorker" in navigator,
-        webAssembly: typeof WebAssembly !== "undefined",
-        sharedArrayBuffer: typeof SharedArrayBuffer !== "undefined"
-    };
-}
-
-
-/* =========================
-   CLIENT HINTS
-========================= */
-
-async function getClientHints() {
-    const uaData = navigator.userAgentData;
-
-    if (!uaData) {
-        return { supported: false };
-    }
-
-    const result = {
-        supported: true,
-        mobile: uaData.mobile,
-        platform: uaData.platform,
-        brands: uaData.brands || []
-    };
-
-    if (typeof uaData.getHighEntropyValues !== "function") {
-        result.highEntropySupported = false;
-        return result;
-    }
-
-    try {
-        const hints = await uaData.getHighEntropyValues([
-            "architecture",
-            "bitness",
-            "model",
-            "platformVersion",
-            "fullVersionList",
-            "wow64"
-        ]);
-
-        result.highEntropySupported = true;
-        result.highEntropy = hints;
-
-    } catch (e) {
-        result.highEntropyError = e.message;
-    }
-
-    return result;
-}
-
-
-/* =========================
-   CANVAS FINGERPRINT
-========================= */
-
-function getCanvasFingerprint() {
-    try {
-        const canvas = document.createElement("canvas");
-
-        canvas.width = 300;
-        canvas.height = 100;
-
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-            return { supported: false };
-        }
-
-        ctx.textBaseline = "alphabetic";
-        ctx.font = "14px Arial";
-
-        ctx.fillStyle = "#f60";
-        ctx.fillRect(20, 10, 100, 30);
-
-        ctx.fillStyle = "#069";
-        ctx.fillText("Inspector 123", 5, 60);
-
-        ctx.fillStyle = "rgba(102,204,0,.7)";
-        ctx.fillText("Inspector 123", 8, 63);
-
-        ctx.beginPath();
-        ctx.arc(220, 45, 25, 0, Math.PI * 2);
-        ctx.fillStyle = "#9c27b0";
-        ctx.fill();
-
-        const image = ctx.getImageData(
-            0, 0, canvas.width, canvas.height
-        );
-
-        const bytes = image.data;
-
-        return {
-            supported: true,
-            width: canvas.width,
-            height: canvas.height,
-            hash: hashBytes(bytes),
-            dataLength: bytes.length,
-            toDataURLSupported: safe(() =>
-                canvas.toDataURL().startsWith("data:image/")
-            , false)
-        };
-
-    } catch (e) {
-        return errorInfo(e);
-    }
-}
-
-
-/* =========================
-   WEBGL
-========================= */
-
-function getWebGL() {
-    try {
-        const canvas = document.createElement("canvas");
-
-        const gl =
-            canvas.getContext("webgl") ||
-            canvas.getContext("experimental-webgl");
-
-        if (!gl) {
-            return { supported: false };
-        }
-
-        const debug = gl.getExtension(
-            "WEBGL_debug_renderer_info"
-        );
-
-        const extensions = (
-            gl.getSupportedExtensions() || []
-        ).sort();
-
-        function precision(stage, type) {
-            const p = gl.getShaderPrecisionFormat(stage, type);
-
-            if (!p) return null;
-
+        
+        function errorInfo(e) {
             return {
-                rangeMin: p.rangeMin,
-                rangeMax: p.rangeMax,
-                precision: p.precision
+                error: e?.message || String(e)
             };
         }
-
-        const precisionData = {
-            vertexHighFloat: precision(
-                gl.VERTEX_SHADER,
-                gl.HIGH_FLOAT
-            ),
-            vertexMediumFloat: precision(
-                gl.VERTEX_SHADER,
-                gl.MEDIUM_FLOAT
-            ),
-            fragmentHighFloat: precision(
-                gl.FRAGMENT_SHADER,
-                gl.HIGH_FLOAT
-            ),
-            fragmentMediumFloat: precision(
-                gl.FRAGMENT_SHADER,
-                gl.MEDIUM_FLOAT
-            ),
-            fragmentHighInt: precision(
-                gl.FRAGMENT_SHADER,
-                gl.HIGH_INT
-            )
-        };
-
-        return {
-            supported: true,
-
-            vendor: gl.getParameter(gl.VENDOR),
-            renderer: gl.getParameter(gl.RENDERER),
-
-            unmaskedVendor: debug
-                ? gl.getParameter(debug.UNMASKED_VENDOR_WEBGL)
-                : null,
-
-            unmaskedRenderer: debug
-                ? gl.getParameter(debug.UNMASKED_RENDERER_WEBGL)
-                : null,
-
-            version: gl.getParameter(gl.VERSION),
-            shadingLanguageVersion: gl.getParameter(
-                gl.SHADING_LANGUAGE_VERSION
-            ),
-
-            maxTextureSize: gl.getParameter(
-                gl.MAX_TEXTURE_SIZE
-            ),
-
-            maxCubeMapTextureSize: gl.getParameter(
-                gl.MAX_CUBE_MAP_TEXTURE_SIZE
-            ),
-
-            maxRenderBufferSize: gl.getParameter(
-                gl.MAX_RENDERBUFFER_SIZE
-            ),
-
-            maxVertexAttribs: gl.getParameter(
-                gl.MAX_VERTEX_ATTRIBS
-            ),
-
-            maxTextureImageUnits: gl.getParameter(
-                gl.MAX_TEXTURE_IMAGE_UNITS
-            ),
-
-            extensionsCount: extensions.length,
-            extensionsHash: hashString(extensions.join(",")),
-            extensions: extensions,
-
-            shaderPrecision: precisionData
-        };
-
-    } catch (e) {
-        return errorInfo(e);
-    }
-}
-
-
-/* =========================
-   AUDIO FINGERPRINT
-========================= */
-
-async function getAudioFingerprint() {
-    try {
-        const OfflineContext =
-            window.OfflineAudioContext ||
-            window.webkitOfflineAudioContext;
-
-        if (!OfflineContext) {
-            return { supported: false };
+        
+        function hashString(str) {
+            let hash = 2166136261;
+            
+            for (let i = 0; i < str.length; i++) {
+                hash ^= str.charCodeAt(i);
+                hash = Math.imul(hash, 16777619);
+            }
+            
+            return (hash >>> 0).toString(16).padStart(8, "0");
         }
-
-        const sampleRate = 44100;
-        const context = new OfflineContext(
-            1,
-            sampleRate,
-            sampleRate
-        );
-
-        const oscillator = context.createOscillator();
-        const compressor = context.createDynamicsCompressor();
-
-        oscillator.type = "triangle";
-        oscillator.frequency.value = 10000;
-
-        compressor.threshold.value = -50;
-        compressor.knee.value = 40;
-        compressor.ratio.value = 12;
-        compressor.attack.value = 0;
-        compressor.release.value = 0.25;
-
-        oscillator.connect(compressor);
-        compressor.connect(context.destination);
-
-        oscillator.start(0);
-
-        const rendered = await context.startRendering();
-        const samples = rendered.getChannelData(0);
-
-        const bytes = new Uint8Array(
-            samples.length * 4
-        );
-
-        const view = new DataView(bytes.buffer);
-
-        for (let i = 0; i < samples.length; i++) {
-            view.setFloat32(i * 4, samples[i], true);
+        
+        function hashBytes(bytes) {
+            let hash = 2166136261;
+            
+            for (const byte of bytes) {
+                hash ^= byte;
+                hash = Math.imul(hash, 16777619);
+            }
+            
+            return (hash >>> 0).toString(16).padStart(8, "0");
         }
-
-        let min = Infinity;
-        let max = -Infinity;
-        let sum = 0;
-
-        for (let i = 0; i < samples.length; i++) {
-            const value = samples[i];
-
-            if (value < min) min = value;
-            if (value > max) max = value;
-
-            sum += Math.abs(value);
+        
+        function stableStringify(value) {
+            if (value === undefined) return "undefined";
+            
+            if (value === null || typeof value !== "object") {
+                return JSON.stringify(value);
+            }
+            
+            if (Array.isArray(value)) {
+                return "[" + value.map(stableStringify).join(",") + "]";
+            }
+            
+            const keys = Object.keys(value).sort();
+            
+            return "{" + keys.map(key =>
+                JSON.stringify(key) + ":" + stableStringify(value[key])
+            ).join(",") + "}";
         }
-
-        return {
-            supported: true,
-            sampleRate: rendered.sampleRate,
-            length: samples.length,
-            hash: hashBytes(bytes),
-            min: Number(min.toFixed(7)),
-            max: Number(max.toFixed(7)),
-            averageAbsolute: Number(
-                (sum / samples.length).toFixed(7)
-            )
-        };
-
-    } catch (e) {
-        return errorInfo(e);
-    }
-}
-
-
-/* =========================
-   WEBRTC DIAGNOSTICS
-========================= */
-
-async function getWebRTC() {
-    if (!window.RTCPeerConnection) {
-        return { supported: false };
-    }
-
-    let pc;
-
-    try {
-        pc = new RTCPeerConnection({
-            iceServers: []
-        });
-
-        const candidates = [];
-
-        pc.createDataChannel("inspector");
-
-        pc.onicecandidate = event => {
-            if (!event.candidate) return;
-
-            const line = event.candidate.candidate || "";
-
-            const type =
-                line.match(/\btyp\s+(\w+)/)?.[1] || "unknown";
-
-            const protocol =
-                line.match(/\b(udp|tcp)\b/i)?.[1] || "unknown";
-
-            const address =
-                line.match(/\b(?:raddr\s+)?([0-9a-f:.]+|[a-z0-9-]+\.local)\b/i)?.[1]
-                || null;
-
-            let addressType = "unknown";
-
-            if (address) {
-                if (address.endsWith(".local")) {
-                    addressType = "mDNS";
-                } else if (
-                    address.includes(":") ||
-                    /^10\./.test(address) ||
-                    /^192\.168\./.test(address) ||
-                    /^172\.(1[6-9]|2\d|3[01])\./.test(address) ||
-                    /^127\./.test(address)
-                ) {
-                    addressType = "private-or-IPv6";
+        
+        function cleanObject(obj) {
+            if (!obj || typeof obj !== "object") return obj;
+            
+            const result = {};
+            
+            for (const [key, value] of Object.entries(obj)) {
+                if (
+                    value === undefined ||
+                    /^(hash|signature|query_id|auth_date|initData)$/i.test(key)
+                ) continue;
+                
+                if (value && typeof value === "object") {
+                    result[key] = cleanObject(value);
                 } else {
-                    addressType = "other";
+                    result[key] = value;
                 }
             }
-
-            candidates.push({
-                type,
-                protocol,
-                addressType,
-                addressExposed: !!address && !address.endsWith(".local")
-            });
-        };
-
-        const offer = await pc.createOffer();
-
-        await pc.setLocalDescription(offer);
-
-        await new Promise(resolve => {
-            const timeout = setTimeout(resolve, 2500);
-
-            pc.addEventListener("icegatheringstatechange", () => {
-                if (pc.iceGatheringState === "complete") {
-                    clearTimeout(timeout);
-                    resolve();
+            
+            return result;
+        }
+        
+        
+        /* =========================
+           BASIC DEVICE DATA
+        ========================= */
+        
+        function getDeviceData() {
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                vendor: navigator.vendor,
+                language: navigator.language,
+                languages: navigator.languages,
+                hardwareConcurrency: navigator.hardwareConcurrency,
+                deviceMemory: navigator.deviceMemory ?? null,
+                maxTouchPoints: navigator.maxTouchPoints,
+                cookieEnabled: navigator.cookieEnabled,
+                online: navigator.onLine,
+                webdriver: navigator.webdriver ?? null,
+                pdfViewerEnabled: navigator.pdfViewerEnabled ?? null
+            };
+        }
+        
+        
+        /* =========================
+           SCREEN
+        ========================= */
+        
+        function getScreenData() {
+            return {
+                width: screen.width,
+                height: screen.height,
+                availWidth: screen.availWidth,
+                availHeight: screen.availHeight,
+                colorDepth: screen.colorDepth,
+                pixelDepth: screen.pixelDepth,
+                devicePixelRatio: window.devicePixelRatio,
+                innerWidth: window.innerWidth,
+                innerHeight: window.innerHeight,
+                outerWidth: window.outerWidth,
+                outerHeight: window.outerHeight,
+                orientation: screen.orientation?.type ?? null
+            };
+        }
+        
+        
+        /* =========================
+           BROWSER / WEBVIEW
+        ========================= */
+        
+        function getBrowserData() {
+            return {
+                language: navigator.language,
+                languages: navigator.languages,
+                timezone: safe(() =>
+                    Intl.DateTimeFormat().resolvedOptions().timeZone
+                ),
+                timezoneOffset: new Date().getTimezoneOffset(),
+                localStorage: safe(() => {
+                    const key = "__inspector_test__";
+                    localStorage.setItem(key, "1");
+                    localStorage.removeItem(key);
+                    return true;
+                }, false),
+                sessionStorage: safe(() => {
+                    const key = "__inspector_test__";
+                    sessionStorage.setItem(key, "1");
+                    sessionStorage.removeItem(key);
+                    return true;
+                }, false),
+                serviceWorker: "serviceWorker" in navigator,
+                webAssembly: typeof WebAssembly !== "undefined",
+                sharedArrayBuffer: typeof SharedArrayBuffer !== "undefined"
+            };
+        }
+        
+        
+        /* =========================
+           CLIENT HINTS
+        ========================= */
+        
+        async function getClientHints() {
+            const uaData = navigator.userAgentData;
+            
+            if (!uaData) {
+                return { supported: false };
+            }
+            
+            const result = {
+                supported: true,
+                mobile: uaData.mobile,
+                platform: uaData.platform,
+                brands: uaData.brands || []
+            };
+            
+            if (typeof uaData.getHighEntropyValues !== "function") {
+                result.highEntropySupported = false;
+                return result;
+            }
+            
+            try {
+                const hints = await uaData.getHighEntropyValues([
+                    "architecture",
+                    "bitness",
+                    "model",
+                    "platformVersion",
+                    "fullVersionList",
+                    "wow64"
+                ]);
+                
+                result.highEntropySupported = true;
+                result.highEntropy = hints;
+                
+            } catch (e) {
+                result.highEntropyError = e.message;
+            }
+            
+            return result;
+        }
+        
+        
+        /* =========================
+           CANVAS FINGERPRINT
+        ========================= */
+        
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement("canvas");
+                
+                canvas.width = 300;
+                canvas.height = 100;
+                
+                const ctx = canvas.getContext("2d");
+                
+                if (!ctx) {
+                    return { supported: false };
                 }
-            });
-        });
-
-        const unique = [
-            ...new Map(
-                candidates.map(item => [
-                    JSON.stringify(item),
-                    item
-                ])
-            ).values()
-        ];
-
-        return {
-            supported: true,
-            gatheringState: pc.iceGatheringState,
-            candidateCount: unique.length,
-            candidateTypes: [...new Set(
-                unique.map(x => x.type)
-            )],
-            protocols: [...new Set(
-                unique.map(x => x.protocol)
-            )],
-            addressTypes: [...new Set(
-                unique.map(x => x.addressType)
-            )],
-            candidates: unique,
-            note: "No STUN server configured. This test does not determine public IP exposure."
-        };
-
-    } catch (e) {
-        return errorInfo(e);
-
-    } finally {
-        try {
-            pc?.close();
-        } catch (_) {}
-    }
-}
-
-
-/* =========================
-   TELEGRAM DATA
-========================= */
-
-function getTelegramData() {
-    if (!tg) {
-        return { supported: false };
-    }
-
-    const user = tg.initDataUnsafe?.user;
-
-    return {
-        supported: true,
-
-        platform: tg.platform,
-        version: tg.version,
-        colorScheme: tg.colorScheme,
-        themeParams: tg.themeParams,
-        isExpanded: tg.isExpanded,
-        viewportHeight: tg.viewportHeight,
-        viewportStableHeight: tg.viewportStableHeight,
-        headerColor: tg.headerColor,
-        backgroundColor: tg.backgroundColor,
-        isFullscreen: tg.isFullscreen ?? null,
-
-        user: user ? {
-            id: user.id,
-            first_name: user.first_name,
-            last_name: user.last_name,
-            username: user.username,
-            language_code: user.language_code,
-            is_premium: user.is_premium,
-            allows_write_to_pm: user.allows_write_to_pm,
-            photo_url: user.photo_url
-        } : null,
-
-        chatType: tg.initDataUnsafe?.chat_type ?? null,
-        startParam: tg.initDataUnsafe?.start_param ?? null
-    };
-}
-
-
-/* =========================
-   ENVIRONMENT
-========================= */
-
-function getEnvironment() {
-    return {
-        secureContext: window.isSecureContext,
-        origin: location.origin,
-        protocol: location.protocol,
-        referrer: document.referrer || null,
-        visibilityState: document.visibilityState,
-        crossOriginIsolated: window.crossOriginIsolated ?? null,
-
-        permissionsAPI:
-            typeof navigator.permissions !== "undefined",
-
-        geolocationAPI:
-            "geolocation" in navigator,
-
-        bluetoothAPI:
-            "bluetooth" in navigator,
-
-        usbAPI:
-            "usb" in navigator,
-
-        mediaDevicesAPI:
-            !!navigator.mediaDevices,
-
-        webRTC:
-            !!window.RTCPeerConnection
-    };
-}
-
-
-/* =========================
-   COLLECTION
-========================= */
-
-async function collect() {
-    const report = {
-        app: {
-            name: "Device Inspector",
-            version: APP_VERSION,
-            collectedAt: new Date().toISOString()
-        },
-
-        device: getDeviceData(),
-        screen: getScreenData(),
-        browser: getBrowserData(),
-        clientHints: await getClientHints(),
-        canvas: getCanvasFingerprint(),
-        webgl: getWebGL(),
-        audio: await getAudioFingerprint(),
-        webRTC: await getWebRTC(),
-        telegram: getTelegramData(),
-        environment: getEnvironment()
-    };
-
-    return cleanObject(report);
-}
-
-
-/* =========================
-   DISPLAY
-========================= */
-
-function displayValue(value) {
-    if (value === null) return "null";
-    if (value === undefined) return "undefined";
-
-    if (typeof value === "object") {
-        return JSON.stringify(value, null, 2);
-    }
-
-    return String(value);
-}
-
-function renderReport(report) {
-    const output = $("output");
-    output.replaceChildren();
-
-    for (const [sectionName, sectionData] of Object.entries(report)) {
-        if (
-            !sectionData ||
-            typeof sectionData !== "object" ||
-            Array.isArray(sectionData)
-        ) continue;
-
-        const section = document.createElement("section");
-        section.className = "section";
-
-        const title = document.createElement("div");
-        title.className = "section-title";
-        title.textContent = sectionName;
-
-        const grid = document.createElement("div");
-        grid.className = "data-grid";
-
-        for (const [key, value] of Object.entries(sectionData)) {
-            const field = document.createElement("div");
-            field.className = "field";
-
-            const longValue =
-                typeof value === "object" ||
-                String(value).length > 45;
-
-            if (longValue) field.classList.add("wide");
-
-            const name = document.createElement("div");
-            name.className = "field-name";
-            name.textContent = key;
-
-            const val = document.createElement("div");
-            val.className = "field-value";
-            val.textContent = displayValue(value);
-
-            field.append(name, val);
-            grid.append(field);
+                
+                ctx.textBaseline = "alphabetic";
+                ctx.font = "14px Arial";
+                
+                ctx.fillStyle = "#f60";
+                ctx.fillRect(20, 10, 100, 30);
+                
+                ctx.fillStyle = "#069";
+                ctx.fillText("Inspector 123", 5, 60);
+                
+                ctx.fillStyle = "rgba(102,204,0,.7)";
+                ctx.fillText("Inspector 123", 8, 63);
+                
+                ctx.beginPath();
+                ctx.arc(220, 45, 25, 0, Math.PI * 2);
+                ctx.fillStyle = "#9c27b0";
+                ctx.fill();
+                
+                const image = ctx.getImageData(
+                    0, 0, canvas.width, canvas.height
+                );
+                
+                const bytes = image.data;
+                
+                return {
+                    supported: true,
+                    width: canvas.width,
+                    height: canvas.height,
+                    hash: hashBytes(bytes),
+                    dataLength: bytes.length,
+                    toDataURLSupported: safe(() =>
+                        canvas.toDataURL().startsWith("data:image/"), false)
+                };
+                
+            } catch (e) {
+                return errorInfo(e);
+            }
         }
-
-        section.append(title, grid);
-        output.append(section);
-    }
-}
-
-
-/* =========================
-   COPY REPORT
-========================= */
-
-let currentReport = null;
-
-async function copyText(text) {
-    try {
-        await navigator.clipboard.writeText(text);
-        return true;
-    } catch (_) {
-        const area = document.createElement("textarea");
-
-        area.value = text;
-        area.style.position = "fixed";
-        area.style.opacity = "0";
-
-        document.body.append(area);
-        area.select();
-
-        const result = safe(() =>
-            document.execCommand("copy")
-        , false);
-
-        area.remove();
-
-        return result;
-    }
-}
-
-
-/* =========================
-   FLATTEN FOR COMPARISON
-========================= */
-
-function flatten(obj, prefix = "", result = {}) {
-    if (obj === undefined) return result;
-
-    if (
-        obj === null ||
-        typeof obj !== "object"
-    ) {
-        if (prefix) result[prefix] = obj;
-        return result;
-    }
-
-    const entries = Object.entries(obj);
-
-    if (!entries.length) {
-        if (prefix) result[prefix] = {};
-        return result;
-    }
-
-    for (const [key, value] of entries) {
-        if (value === undefined) continue;
-
-        const path = prefix
-            ? prefix + "." + key
-            : key;
-
-        flatten(value, path, result);
-    }
-
-    return result;
-}
-
-
-/* =========================
-   COMPARE REPORTS
-========================= */
-
-function compareReports(firstReport, secondReport) {
-    const first = flatten(firstReport);
-    const second = flatten(secondReport);
-
-    const paths = new Set([
-        ...Object.keys(first),
-        ...Object.keys(second)
-    ]);
-
-    const comparison = [];
-
-    for (const path of paths) {
-        const hasFirst = Object.hasOwn(first, path);
-        const hasSecond = Object.hasOwn(second, path);
-
-        if (!hasFirst && !hasSecond) continue;
-
-        let status;
-
-        if (!hasFirst || !hasSecond) {
-            status = "missing";
-
-        } else if (
-            stableStringify(first[path]) ===
-            stableStringify(second[path])
-        ) {
-            status = "same";
-
-        } else {
-            status = "different";
+        
+        
+        /* =========================
+           WEBGL
+        ========================= */
+        
+        function getWebGL() {
+            try {
+                const canvas = document.createElement("canvas");
+                
+                const gl =
+                    canvas.getContext("webgl") ||
+                    canvas.getContext("experimental-webgl");
+                
+                if (!gl) {
+                    return { supported: false };
+                }
+                
+                const debug = gl.getExtension(
+                    "WEBGL_debug_renderer_info"
+                );
+                
+                const extensions = (
+                    gl.getSupportedExtensions() || []
+                ).sort();
+                
+                function precision(stage, type) {
+                    const p = gl.getShaderPrecisionFormat(stage, type);
+                    
+                    if (!p) return null;
+                    
+                    return {
+                        rangeMin: p.rangeMin,
+                        rangeMax: p.rangeMax,
+                        precision: p.precision
+                    };
+                }
+                
+                const precisionData = {
+                    vertexHighFloat: precision(
+                        gl.VERTEX_SHADER,
+                        gl.HIGH_FLOAT
+                    ),
+                    vertexMediumFloat: precision(
+                        gl.VERTEX_SHADER,
+                        gl.MEDIUM_FLOAT
+                    ),
+                    fragmentHighFloat: precision(
+                        gl.FRAGMENT_SHADER,
+                        gl.HIGH_FLOAT
+                    ),
+                    fragmentMediumFloat: precision(
+                        gl.FRAGMENT_SHADER,
+                        gl.MEDIUM_FLOAT
+                    ),
+                    fragmentHighInt: precision(
+                        gl.FRAGMENT_SHADER,
+                        gl.HIGH_INT
+                    )
+                };
+                
+                return {
+                    supported: true,
+                    
+                    vendor: gl.getParameter(gl.VENDOR),
+                    renderer: gl.getParameter(gl.RENDERER),
+                    
+                    unmaskedVendor: debug ?
+                        gl.getParameter(debug.UNMASKED_VENDOR_WEBGL) :
+                        null,
+                    
+                    unmaskedRenderer: debug ?
+                        gl.getParameter(debug.UNMASKED_RENDERER_WEBGL) :
+                        null,
+                    
+                    version: gl.getParameter(gl.VERSION),
+                    shadingLanguageVersion: gl.getParameter(
+                        gl.SHADING_LANGUAGE_VERSION
+                    ),
+                    
+                    maxTextureSize: gl.getParameter(
+                        gl.MAX_TEXTURE_SIZE
+                    ),
+                    
+                    maxCubeMapTextureSize: gl.getParameter(
+                        gl.MAX_CUBE_MAP_TEXTURE_SIZE
+                    ),
+                    
+                    maxRenderBufferSize: gl.getParameter(
+                        gl.MAX_RENDERBUFFER_SIZE
+                    ),
+                    
+                    maxVertexAttribs: gl.getParameter(
+                        gl.MAX_VERTEX_ATTRIBS
+                    ),
+                    
+                    maxTextureImageUnits: gl.getParameter(
+                        gl.MAX_TEXTURE_IMAGE_UNITS
+                    ),
+                    
+                    extensionsCount: extensions.length,
+                    extensionsHash: hashString(extensions.join(",")),
+                    extensions: extensions,
+                    
+                    shaderPrecision: precisionData
+                };
+                
+            } catch (e) {
+                return errorInfo(e);
+            }
         }
-
-        comparison.push({
-            path,
-            status,
-            first: hasFirst ? first[path] : undefined,
-            second: hasSecond ? second[path] : undefined
-        });
-    }
-
-    return comparison;
-}
-
-function renderComparison(comparison) {
-    const output = $("compareOutput");
-    output.replaceChildren();
-
-    const counts = {
-        same: 0,
-        different: 0,
-        missing: 0
-    };
-
-    for (const item of comparison) {
-        counts[item.status]++;
-
-        const row = document.createElement("div");
-        row.className = "result-row";
-
-        const path = document.createElement("div");
-        path.className = "result-path";
-        path.textContent = item.path;
-
-        const values = document.createElement("div");
-        values.className = "result-values";
-
-        const status = document.createElement("div");
-        status.className = item.status;
-        status.textContent = item.status.toUpperCase();
-
-        const first = document.createElement("div");
-        first.textContent =
-            "First: " + displayValue(item.first);
-
-        const second = document.createElement("div");
-        second.textContent =
-            "Second: " + displayValue(item.second);
-
-        values.append(status, first, second);
-        row.append(path, values);
-        output.append(row);
-    }
-
-    $("compareSummary").textContent =
-        `متطابق: ${counts.same} | مختلف: ${counts.different} | مفقود: ${counts.missing}`;
-}
-
-
-/* =========================
-   BUTTONS
-========================= */
-
-async function refreshData() {
-    const button = $("refreshBtn");
-
-    button.disabled = true;
-    $("status").textContent = "جاري جمع البيانات والفحوصات...";
-
-    try {
-        currentReport = await collect();
-
-        renderReport(currentReport);
-
-        $("status").textContent =
-            "اكتمل الفحص بنجاح · " +
-            currentReport.app.collectedAt;
-
-    } catch (e) {
-        $("status").textContent =
-            "حدث خطأ: " + e.message;
-
-    } finally {
-        button.disabled = false;
-    }
-}
-
-$("refreshBtn").addEventListener(
-    "click",
-    refreshData
-);
-
-$("copyBtn").addEventListener("click", async () => {
-    if (!currentReport) return;
-
-    const success = await copyText(
-        JSON.stringify(currentReport, null, 2)
-    );
-
-    $("status").textContent = success
-        ? "تم نسخ التقرير"
-        : "تعذر النسخ";
-});
-
-$("compareBtn").addEventListener("click", () => {
-    if (!currentReport) return;
-
-    try {
-        const second = JSON.parse(
-            $("compareInput").value
+        
+        
+        /* =========================
+           AUDIO FINGERPRINT
+        ========================= */
+        
+        async function getAudioFingerprint() {
+            try {
+                const OfflineContext =
+                    window.OfflineAudioContext ||
+                    window.webkitOfflineAudioContext;
+                
+                if (!OfflineContext) {
+                    return { supported: false };
+                }
+                
+                const sampleRate = 44100;
+                const context = new OfflineContext(
+                    1,
+                    sampleRate,
+                    sampleRate
+                );
+                
+                const oscillator = context.createOscillator();
+                const compressor = context.createDynamicsCompressor();
+                
+                oscillator.type = "triangle";
+                oscillator.frequency.value = 10000;
+                
+                compressor.threshold.value = -50;
+                compressor.knee.value = 40;
+                compressor.ratio.value = 12;
+                compressor.attack.value = 0;
+                compressor.release.value = 0.25;
+                
+                oscillator.connect(compressor);
+                compressor.connect(context.destination);
+                
+                oscillator.start(0);
+                
+                const rendered = await context.startRendering();
+                const samples = rendered.getChannelData(0);
+                
+                const bytes = new Uint8Array(
+                    samples.length * 4
+                );
+                
+                const view = new DataView(bytes.buffer);
+                
+                for (let i = 0; i < samples.length; i++) {
+                    view.setFloat32(i * 4, samples[i], true);
+                }
+                
+                let min = Infinity;
+                let max = -Infinity;
+                let sum = 0;
+                
+                for (let i = 0; i < samples.length; i++) {
+                    const value = samples[i];
+                    
+                    if (value < min) min = value;
+                    if (value > max) max = value;
+                    
+                    sum += Math.abs(value);
+                }
+                
+                return {
+                    supported: true,
+                    sampleRate: rendered.sampleRate,
+                    length: samples.length,
+                    hash: hashBytes(bytes),
+                    min: Number(min.toFixed(7)),
+                    max: Number(max.toFixed(7)),
+                    averageAbsolute: Number(
+                        (sum / samples.length).toFixed(7)
+                    )
+                };
+                
+            } catch (e) {
+                return errorInfo(e);
+            }
+        }
+        
+        
+        /* =========================
+           WEBRTC DIAGNOSTICS
+        ========================= */
+        
+        async function getWebRTC() {
+            if (!window.RTCPeerConnection) {
+                return { supported: false };
+            }
+            
+            let pc;
+            
+            try {
+                pc = new RTCPeerConnection({
+                    iceServers: []
+                });
+                
+                const candidates = [];
+                
+                pc.createDataChannel("inspector");
+                
+                pc.onicecandidate = event => {
+                    if (!event.candidate) return;
+                    
+                    const line = event.candidate.candidate || "";
+                    
+                    const type =
+                        line.match(/\btyp\s+(\w+)/)?.[1] || "unknown";
+                    
+                    const protocol =
+                        line.match(/\b(udp|tcp)\b/i)?.[1] || "unknown";
+                    
+                    const address =
+                        line.match(/\b(?:raddr\s+)?([0-9a-f:.]+|[a-z0-9-]+\.local)\b/i)?.[1] ||
+                        null;
+                    
+                    let addressType = "unknown";
+                    
+                    if (address) {
+                        if (address.endsWith(".local")) {
+                            addressType = "mDNS";
+                        } else if (
+                            address.includes(":") ||
+                            /^10\./.test(address) ||
+                            /^192\.168\./.test(address) ||
+                            /^172\.(1[6-9]|2\d|3[01])\./.test(address) ||
+                            /^127\./.test(address)
+                        ) {
+                            addressType = "private-or-IPv6";
+                        } else {
+                            addressType = "other";
+                        }
+                    }
+                    
+                    candidates.push({
+                        type,
+                        protocol,
+                        addressType,
+                        addressExposed: !!address && !address.endsWith(".local")
+                    });
+                };
+                
+                const offer = await pc.createOffer();
+                
+                await pc.setLocalDescription(offer);
+                
+                await new Promise(resolve => {
+                    const timeout = setTimeout(resolve, 2500);
+                    
+                    pc.addEventListener("icegatheringstatechange", () => {
+                        if (pc.iceGatheringState === "complete") {
+                            clearTimeout(timeout);
+                            resolve();
+                        }
+                    });
+                });
+                
+                const unique = [
+                    ...new Map(
+                        candidates.map(item => [
+                            JSON.stringify(item),
+                            item
+                        ])
+                    ).values()
+                ];
+                
+                return {
+                    supported: true,
+                    gatheringState: pc.iceGatheringState,
+                    candidateCount: unique.length,
+                    candidateTypes: [...new Set(
+                        unique.map(x => x.type)
+                    )],
+                    protocols: [...new Set(
+                        unique.map(x => x.protocol)
+                    )],
+                    addressTypes: [...new Set(
+                        unique.map(x => x.addressType)
+                    )],
+                    candidates: unique,
+                    note: "No STUN server configured. This test does not determine public IP exposure."
+                };
+                
+            } catch (e) {
+                return errorInfo(e);
+                
+            } finally {
+                try {
+                    pc?.close();
+                } catch (_) {}
+            }
+        }
+        
+        
+        /* =========================
+           TELEGRAM DATA
+        ========================= */
+        
+        function getTelegramData() {
+            if (!tg) {
+                return { supported: false };
+            }
+            
+            const user = tg.initDataUnsafe?.user;
+            
+            return {
+                supported: true,
+                
+                platform: tg.platform,
+                version: tg.version,
+                colorScheme: tg.colorScheme,
+                themeParams: tg.themeParams,
+                isExpanded: tg.isExpanded,
+                viewportHeight: tg.viewportHeight,
+                viewportStableHeight: tg.viewportStableHeight,
+                headerColor: tg.headerColor,
+                backgroundColor: tg.backgroundColor,
+                isFullscreen: tg.isFullscreen ?? null,
+                
+                user: user ? {
+                    id: user.id,
+                    first_name: user.first_name,
+                    last_name: user.last_name,
+                    username: user.username,
+                    language_code: user.language_code,
+                    is_premium: user.is_premium,
+                    allows_write_to_pm: user.allows_write_to_pm,
+                    photo_url: user.photo_url
+                } : null,
+                
+                chatType: tg.initDataUnsafe?.chat_type ?? null,
+                startParam: tg.initDataUnsafe?.start_param ?? null
+            };
+        }
+        
+        
+        /* =========================
+           ENVIRONMENT
+        ========================= */
+        
+        function getEnvironment() {
+            return {
+                secureContext: window.isSecureContext,
+                origin: location.origin,
+                protocol: location.protocol,
+                referrer: document.referrer || null,
+                visibilityState: document.visibilityState,
+                crossOriginIsolated: window.crossOriginIsolated ?? null,
+                
+                permissionsAPI: typeof navigator.permissions !== "undefined",
+                
+                geolocationAPI: "geolocation" in navigator,
+                
+                bluetoothAPI: "bluetooth" in navigator,
+                
+                usbAPI: "usb" in navigator,
+                
+                mediaDevicesAPI:
+                    !!navigator.mediaDevices,
+                
+                webRTC:
+                    !!window.RTCPeerConnection
+            };
+        }
+        
+        
+        /* =========================
+           COLLECTION
+        ========================= */
+        
+        async function collect() {
+            const report = {
+                app: {
+                    name: "Device Inspector",
+                    version: APP_VERSION,
+                    collectedAt: new Date().toISOString()
+                },
+                
+                device: getDeviceData(),
+                screen: getScreenData(),
+                browser: getBrowserData(),
+                clientHints: await getClientHints(),
+                canvas: getCanvasFingerprint(),
+                webgl: getWebGL(),
+                audio: await getAudioFingerprint(),
+                webRTC: await getWebRTC(),
+                telegram: getTelegramData(),
+                environment: getEnvironment()
+            };
+            
+            return cleanObject(report);
+        }
+        
+        
+        /* =========================
+           DISPLAY
+        ========================= */
+        
+        function displayValue(value) {
+            if (value === null) return "null";
+            if (value === undefined) return "undefined";
+            
+            if (typeof value === "object") {
+                return JSON.stringify(value, null, 2);
+            }
+            
+            return String(value);
+        }
+        
+        function renderReport(report) {
+            const output = $("output");
+            output.replaceChildren();
+            
+            for (const [sectionName, sectionData] of Object.entries(report)) {
+                if (
+                    !sectionData ||
+                    typeof sectionData !== "object" ||
+                    Array.isArray(sectionData)
+                ) continue;
+                
+                const section = document.createElement("section");
+                section.className = "section";
+                
+                const title = document.createElement("div");
+                title.className = "section-title";
+                title.textContent = sectionName;
+                
+                const grid = document.createElement("div");
+                grid.className = "data-grid";
+                
+                for (const [key, value] of Object.entries(sectionData)) {
+                    const field = document.createElement("div");
+                    field.className = "field";
+                    
+                    const longValue =
+                        typeof value === "object" ||
+                        String(value).length > 45;
+                    
+                    if (longValue) field.classList.add("wide");
+                    
+                    const name = document.createElement("div");
+                    name.className = "field-name";
+                    name.textContent = key;
+                    
+                    const val = document.createElement("div");
+                    val.className = "field-value";
+                    val.textContent = displayValue(value);
+                    
+                    field.append(name, val);
+                    grid.append(field);
+                }
+                
+                section.append(title, grid);
+                output.append(section);
+            }
+        }
+        
+        
+        /* =========================
+           COPY REPORT
+        ========================= */
+        
+        let currentReport = null;
+        
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                return true;
+            } catch (_) {
+                const area = document.createElement("textarea");
+                
+                area.value = text;
+                area.style.position = "fixed";
+                area.style.opacity = "0";
+                
+                document.body.append(area);
+                area.select();
+                
+                const result = safe(() =>
+                    document.execCommand("copy"), false);
+                
+                area.remove();
+                
+                return result;
+            }
+        }
+        
+        
+        /* =========================
+           FLATTEN FOR COMPARISON
+        ========================= */
+        
+        function flatten(obj, prefix = "", result = {}) {
+            if (obj === undefined) return result;
+            
+            if (
+                obj === null ||
+                typeof obj !== "object"
+            ) {
+                if (prefix) result[prefix] = obj;
+                return result;
+            }
+            
+            const entries = Object.entries(obj);
+            
+            if (!entries.length) {
+                if (prefix) result[prefix] = {};
+                return result;
+            }
+            
+            for (const [key, value] of entries) {
+                if (value === undefined) continue;
+                
+                const path = prefix ?
+                    prefix + "." + key :
+                    key;
+                
+                flatten(value, path, result);
+            }
+            
+            return result;
+        }
+        
+        
+        /* =========================
+           COMPARE REPORTS
+        ========================= */
+        
+        function compareReports(firstReport, secondReport) {
+            const first = flatten(firstReport);
+            const second = flatten(secondReport);
+            
+            const paths = new Set([
+                ...Object.keys(first),
+                ...Object.keys(second)
+            ]);
+            
+            const comparison = [];
+            
+            for (const path of paths) {
+                const hasFirst = Object.hasOwn(first, path);
+                const hasSecond = Object.hasOwn(second, path);
+                
+                if (!hasFirst && !hasSecond) continue;
+                
+                let status;
+                
+                if (!hasFirst || !hasSecond) {
+                    status = "missing";
+                    
+                } else if (
+                    stableStringify(first[path]) ===
+                    stableStringify(second[path])
+                ) {
+                    status = "same";
+                    
+                } else {
+                    status = "different";
+                }
+                
+                comparison.push({
+                    path,
+                    status,
+                    first: hasFirst ? first[path] : undefined,
+                    second: hasSecond ? second[path] : undefined
+                });
+            }
+            
+            return comparison;
+        }
+        
+        function renderComparison(comparison) {
+            const output = $("compareOutput");
+            output.replaceChildren();
+            
+            const counts = {
+                same: 0,
+                different: 0,
+                missing: 0
+            };
+            
+            for (const item of comparison) {
+                counts[item.status]++;
+                
+                const row = document.createElement("div");
+                row.className = "result-row";
+                
+                const path = document.createElement("div");
+                path.className = "result-path";
+                path.textContent = item.path;
+                
+                const values = document.createElement("div");
+                values.className = "result-values";
+                
+                const status = document.createElement("div");
+                status.className = item.status;
+                status.textContent = item.status.toUpperCase();
+                
+                const first = document.createElement("div");
+                first.textContent =
+                    "First: " + displayValue(item.first);
+                
+                const second = document.createElement("div");
+                second.textContent =
+                    "Second: " + displayValue(item.second);
+                
+                values.append(status, first, second);
+                row.append(path, values);
+                output.append(row);
+            }
+            
+            $("compareSummary").textContent =
+                `متطابق: ${counts.same} | مختلف: ${counts.different} | مفقود: ${counts.missing}`;
+        }
+        
+        
+        /* =========================
+           BUTTONS
+        ========================= */
+        
+        async function refreshData() {
+            const button = $("refreshBtn");
+            
+            button.disabled = true;
+            $("status").textContent = "جاري جمع البيانات والفحوصات...";
+            
+            try {
+                currentReport = await collect();
+                
+                renderReport(currentReport);
+                
+                $("status").textContent =
+                    "اكتمل الفحص بنجاح · " +
+                    currentReport.app.collectedAt;
+                
+            } catch (e) {
+                $("status").textContent =
+                    "حدث خطأ: " + e.message;
+                
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        $("refreshBtn").addEventListener(
+            "click",
+            refreshData
         );
-
-        if (!second || typeof second !== "object") {
-            throw new Error("Invalid report");
-        }
-
-        const result = compareReports(
-            currentReport,
-            second
-        );
-
-        renderComparison(result);
-
-    } catch (e) {
-        $("compareSummary").textContent =
-            "خطأ في JSON: " + e.message;
-    }
-});
-
-$("clearBtn").addEventListener("click", () => {
-    $("compareInput").value = "";
-    $("compareOutput").replaceChildren();
-    $("compareSummary").textContent = "";
-});
-
-
-/* =========================
-   START
-========================= */
-
-refreshData();
-
-</script>
+        
+        $("copyBtn").addEventListener("click", async () => {
+            if (!currentReport) return;
+            
+            const success = await copyText(
+                JSON.stringify(currentReport, null, 2)
+            );
+            
+            $("status").textContent = success ?
+                "تم نسخ التقرير" :
+                "تعذر النسخ";
+        });
+        
+        $("compareBtn").addEventListener("click", () => {
+            if (!currentReport) return;
+            
+            try {
+                const second = JSON.parse(
+                    $("compareInput").value
+                );
+                
+                if (!second || typeof second !== "object") {
+                    throw new Error("Invalid report");
+                }
+                
+                const result = compareReports(
+                    currentReport,
+                    second
+                );
+                
+                renderComparison(result);
+                
+            } catch (e) {
+                $("compareSummary").textContent =
+                    "خطأ في JSON: " + e.message;
+            }
+        });
+        
+        $("clearBtn").addEventListener("click", () => {
+            $("compareInput").value = "";
+            $("compareOutput").replaceChildren();
+            $("compareSummary").textContent = "";
+        });
+        
+        
+        /* =========================
+           START
+        ========================= */
+        
+        refreshData();
+    </script>
 </body>
+
 </html>
