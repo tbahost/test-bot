@@ -1,14 +1,348 @@
-<!DOCTYPE html>
-<html>
 
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1">
-   <title></title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Device Inspector</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    padding: 18px;
+    background: #10151d;
+    color: #e8edf5;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+header h1 {
+    color: #36a9e8;
+    font-size: 23px;
+    margin: 0 0 8px;
+}
+
+header p {
+    color: #8995a5;
+    font-size: 13px;
+}
+
+.section {
+    background: #1a2330;
+    border: 1px solid #293647;
+    border-radius: 12px;
+    margin: 14px 0;
+    padding: 15px;
+}
+
+.section h2 {
+    font-size: 16px;
+    color: #36a9e8;
+    margin: 0 0 14px;
+}
+
+.item {
+    padding: 11px 0;
+    border-bottom: 1px solid #293647;
+}
+
+.item:last-child { border: 0; }
+
+.key {
+    color: #8995a5;
+    font-size: 12px;
+    direction: ltr;
+    text-align: left;
+}
+
+.value {
+    color: #e8edf5;
+    font-size: 13px;
+    direction: ltr;
+    text-align: left;
+    overflow-wrap: anywhere;
+    margin-top: 6px;
+    user-select: text;
+}
+
+pre {
+    direction: ltr;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+    color: #c4d4e8;
+    background: #111923;
+    padding: 12px;
+    border-radius: 8px;
+}
+
+button {
+    width: 100%;
+    border: 0;
+    border-radius: 9px;
+    padding: 13px;
+    margin-top: 9px;
+    background: #229ed9;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+button.secondary {
+    background: #293647;
+}
+
+footer {
+    text-align: center;
+    color: #697789;
+    font-size: 11px;
+    padding: 20px;
+}
+</style>
 </head>
 
 <body>
-   jwjejej
-</body>
 
+<header>
+    <h1>Device Inspector</h1>
+    <p>Device · Browser · Telegram Mini App</p>
+    <p>مرحبا يا عابد عبدالله المغني</p>
+</header>
+
+<div id="device" class="section">
+    <h2>📱 Device Information</h2>
+</div>
+
+<div id="browser" class="section">
+    <h2>🌐 Browser / WebView</h2>
+</div>
+
+<div id="screen" class="section">
+    <h2>🖥 Screen Information</h2>
+</div>
+
+<div id="webgl" class="section">
+    <h2>🎮 Graphics / WebGL</h2>
+</div>
+
+<div id="telegram" class="section">
+    <h2>✈️ Telegram Information</h2>
+</div>
+
+<div class="section">
+    <h2>Telegram initDataUnsafe</h2>
+    <pre id="initData">{}</pre>
+</div>
+
+<div class="section">
+    <h2>Raw Telegram initData</h2>
+    <pre id="rawData">غير متاح</pre>
+</div>
+
+<button onclick="refreshData()">تحديث البيانات</button>
+<button class="secondary" onclick="copyReport()">نسخ التقرير كاملاً</button>
+
+<footer>
+    Device Inspector · Diagnostic Tool
+</footer>
+
+<script>
+const tg = window.Telegram?.WebApp;
+
+function value(v) {
+    if (v === undefined || v === null || v === "")
+        return "غير متاح";
+    return String(v);
+}
+
+function add(container, name, val) {
+    const item = document.createElement("div");
+    item.className = "item";
+
+    const key = document.createElement("div");
+    key.className = "key";
+    key.textContent = name;
+
+    const data = document.createElement("div");
+    data.className = "value";
+    data.textContent = value(val);
+
+    item.append(key, data);
+    container.appendChild(item);
+}
+
+function getWebGL() {
+    try {
+        const canvas = document.createElement("canvas");
+        const gl = canvas.getContext("webgl") ||
+                   canvas.getContext("experimental-webgl");
+
+        if (!gl) return {};
+
+        const ext = gl.getExtension("WEBGL_debug_renderer_info");
+
+        return {
+            vendor: ext ?
+                gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) :
+                gl.getParameter(gl.VENDOR),
+
+            renderer: ext ?
+                gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) :
+                gl.getParameter(gl.RENDERER),
+
+            version: gl.getParameter(gl.VERSION),
+            shadingLanguage: gl.getParameter(
+                gl.SHADING_LANGUAGE_VERSION
+            )
+        };
+    } catch (e) {
+        return { error: e.message };
+    }
+}
+
+function collect() {
+    const n = navigator;
+    const s = screen;
+
+    return {
+        device: {
+            userAgent: n.userAgent,
+            platform: n.platform,
+            vendor: n.vendor,
+            language: n.language,
+            languages: n.languages,
+            hardwareConcurrency: n.hardwareConcurrency,
+            deviceMemory: n.deviceMemory,
+            maxTouchPoints: n.maxTouchPoints,
+            cookieEnabled: n.cookieEnabled,
+            online: n.onLine
+        },
+
+        browser: {
+            userAgent: n.userAgent,
+            appName: n.appName,
+            appVersion: n.appVersion,
+            product: n.product,
+            productSub: n.productSub,
+            doNotTrack: n.doNotTrack,
+            pdfViewerEnabled: n.pdfViewerEnabled
+        },
+
+        screen: {
+            width: s.width,
+            height: s.height,
+            availWidth: s.availWidth,
+            availHeight: s.availHeight,
+            colorDepth: s.colorDepth,
+            pixelDepth: s.pixelDepth,
+            devicePixelRatio: window.devicePixelRatio,
+            innerWidth: window.innerWidth,
+            innerHeight: window.innerHeight,
+            outerWidth: window.outerWidth,
+            outerHeight: window.outerHeight,
+            orientation: s.orientation?.type
+        },
+
+        webgl: getWebGL(),
+
+        telegram: tg ? {
+            platform: tg.platform,
+            version: tg.version,
+            colorScheme: tg.colorScheme,
+            isExpanded: tg.isExpanded,
+            viewportHeight: tg.viewportHeight,
+            viewportStableHeight: tg.viewportStableHeight,
+            headerColor: tg.headerColor,
+            backgroundColor: tg.backgroundColor,
+            initDataUnsafe: tg.initDataUnsafe
+        } : null,
+
+        initData: tg?.initData || null,
+
+        environment: {
+            timezone: Intl.DateTimeFormat()
+                .resolvedOptions().timeZone,
+            timezoneOffset: new Date().getTimezoneOffset(),
+            date: new Date().toString(),
+            localStorage: (() => {
+                try {
+                    localStorage.setItem("__test", "1");
+                    localStorage.removeItem("__test");
+                    return true;
+                } catch {
+                    return false;
+                }
+            })()
+        }
+    };
+}
+
+let report;
+
+function section(id, data) {
+    const el = document.getElementById(id);
+    const title = el.querySelector("h2");
+    el.replaceChildren(title);
+
+    for (const [key, val] of Object.entries(data))
+        add(el, key, Array.isArray(val) ? val.join(", ") : val);
+}
+
+function refreshData() {
+    report = collect();
+
+    section("device", report.device);
+    section("browser", report.browser);
+    section("screen", report.screen);
+    section("webgl", report.webgl);
+
+    section("telegram", {
+        platform: report.telegram?.platform,
+        version: report.telegram?.version,
+        colorScheme: report.telegram?.colorScheme,
+        isExpanded: report.telegram?.isExpanded,
+        viewportHeight: report.telegram?.viewportHeight,
+        viewportStableHeight: report.telegram?.viewportStableHeight,
+        headerColor: report.telegram?.headerColor,
+        backgroundColor: report.telegram?.backgroundColor
+    });
+
+    document.getElementById("initData").textContent =
+        JSON.stringify(report.telegram?.initDataUnsafe || {}, null, 2);
+
+    document.getElementById("rawData").textContent =
+        report.initData || "غير متاح";
+}
+
+function copyReport() {
+    if (!report) refreshData();
+
+    const text = JSON.stringify(report, null, 2);
+
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(text)
+            .then(() => alert("تم نسخ التقرير"))
+            .catch(() => alert("تعذر النسخ"));
+    } else {
+        alert("خاصية النسخ غير مدعومة في هذه البيئة");
+    }
+}
+
+if (tg) {
+    tg.ready();
+    tg.expand();
+}
+
+refreshData();
+</script>
+
+</body>
 </html>
