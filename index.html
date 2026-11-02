@@ -8,13 +8,25 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+:root {
+    --bg: #10151d;
+    --card: #1a2330;
+    --border: #293647;
+    --text: #e8edf5;
+    --muted: #8995a5;
+    --blue: #36a9e8;
+    --green: #24c78a;
+    --red: #ff6878;
+    --yellow: #e9b84c;
+}
+
 * { box-sizing: border-box; }
 
 body {
     margin: 0;
-    padding: 18px;
-    background: #10151d;
-    color: #e8edf5;
+    padding: 14px;
+    background: var(--bg);
+    color: var(--text);
     font-family: Arial, sans-serif;
 }
 
@@ -24,80 +36,199 @@ header {
 }
 
 header h1 {
-    color: #36a9e8;
-    font-size: 23px;
+    color: var(--blue);
+    font-size: 24px;
     margin: 0 0 8px;
 }
 
 header p {
-    color: #8995a5;
+    color: var(--muted);
     font-size: 13px;
 }
 
 .section {
-    background: #1a2330;
-    border: 1px solid #293647;
-    border-radius: 12px;
-    margin: 14px 0;
-    padding: 15px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    margin: 13px 0;
+    padding: 14px;
+    min-width: 0;
 }
 
 .section h2 {
     font-size: 16px;
-    color: #36a9e8;
+    color: var(--blue);
     margin: 0 0 14px;
 }
 
-.item {
-    padding: 11px 0;
-    border-bottom: 1px solid #293647;
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+    gap: 8px;
 }
 
-.item:last-child { border: 0; }
+.item {
+    background: #131c27;
+    border: 1px solid #263344;
+    border-radius: 8px;
+    padding: 10px;
+    min-width: 0;
+}
+
+.item.long {
+    grid-column: 1 / -1;
+}
 
 .key {
-    color: #8995a5;
-    font-size: 12px;
+    color: var(--muted);
+    font-size: 11px;
     direction: ltr;
     text-align: left;
+    overflow-wrap: anywhere;
+    margin-bottom: 7px;
 }
 
 .value {
-    color: #e8edf5;
+    color: var(--text);
     font-size: 13px;
     direction: ltr;
     text-align: left;
     overflow-wrap: anywhere;
-    margin-top: 6px;
+    word-break: break-word;
+    line-height: 1.5;
     user-select: text;
 }
 
-pre {
+pre, textarea {
+    width: 100%;
+    background: #111923;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: #c4d4e8;
+    padding: 12px;
     direction: ltr;
     text-align: left;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
+    font-family: monospace;
     font-size: 12px;
-    color: #c4d4e8;
-    background: #111923;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+pre {
+    white-space: pre-wrap;
+    max-height: 350px;
+    overflow: auto;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 150px;
+}
+
+button, select {
+    border: 0;
+    border-radius: 9px;
     padding: 12px;
-    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
 }
 
 button {
     width: 100%;
-    border: 0;
-    border-radius: 9px;
-    padding: 13px;
     margin-top: 9px;
     background: #229ed9;
     color: white;
-    font-size: 15px;
-    font-weight: bold;
 }
 
 button.secondary {
     background: #293647;
+}
+
+button:active {
+    opacity: .75;
+}
+
+select {
+    background: #111923;
+    border: 1px solid var(--border);
+    color: white;
+    width: 100%;
+    margin: 8px 0;
+}
+
+.note {
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 7px;
+    margin: 12px 0;
+}
+
+.stat {
+    background: #131c27;
+    padding: 12px 5px;
+    border-radius: 9px;
+    text-align: center;
+}
+
+.stat strong {
+    display: block;
+    font-size: 21px;
+    margin-bottom: 5px;
+}
+
+.stat span {
+    color: var(--muted);
+    font-size: 11px;
+}
+
+.same { color: var(--green); }
+.different { color: var(--red); }
+.missing { color: var(--yellow); }
+
+.diff-item {
+    border: 1px solid var(--border);
+    background: #131c27;
+    border-radius: 9px;
+    padding: 11px;
+    margin: 9px 0;
+    min-width: 0;
+}
+
+.diff-name {
+    direction: ltr;
+    text-align: left;
+    color: var(--blue);
+    font-size: 12px;
+    margin-bottom: 10px;
+    overflow-wrap: anywhere;
+}
+
+.diff-values {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.diff-value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    font-size: 12px;
+    line-height: 1.5;
+    direction: ltr;
+    text-align: left;
+}
+
+.diff-label {
+    color: var(--muted);
+    font-size: 10px;
+    margin-bottom: 5px;
 }
 
 footer {
@@ -113,42 +244,94 @@ footer {
 
 <header>
     <h1>Device Inspector</h1>
-    <p>Device · Browser · Telegram Mini App</p>
-    <p>مرحبا يا عابد عبدالله المغني</p>
+    <p>Device · Browser · Telegram · Fingerprint</p>
 </header>
 
 <div id="device" class="section">
     <h2>📱 Device Information</h2>
+    <div class="data-grid"></div>
 </div>
 
 <div id="browser" class="section">
     <h2>🌐 Browser / WebView</h2>
+    <div class="data-grid"></div>
 </div>
 
 <div id="screen" class="section">
     <h2>🖥 Screen Information</h2>
+    <div class="data-grid"></div>
 </div>
 
 <div id="webgl" class="section">
     <h2>🎮 Graphics / WebGL</h2>
+    <div class="data-grid"></div>
 </div>
 
 <div id="telegram" class="section">
     <h2>✈️ Telegram Information</h2>
+    <div class="data-grid"></div>
+</div>
+
+<div id="environment" class="section">
+    <h2>⚙️ Environment</h2>
+    <div class="data-grid"></div>
 </div>
 
 <div class="section">
-    <h2>Telegram initDataUnsafe</h2>
-    <pre id="initData">{}</pre>
+    <h2>📋 Telegram User Data</h2>
+    <pre id="userData">{}</pre>
 </div>
 
 <div class="section">
-    <h2>Raw Telegram initData</h2>
-    <pre id="rawData">غير متاح</pre>
+    <h2>📦 Copy Current Report</h2>
+    <p class="note">
+        انسخ تقرير هذا الحساب بصيغة JSON ، ثم افتح البوت
+        بالحساب الآخر والصق التقرير في حقل المقارنة أدناه .
+    </p>
+    <button onclick="copyReport()">نسخ التقرير كاملاً</button>
+    <button class="secondary" onclick="refreshData()">تحديث البيانات</button>
 </div>
 
-<button onclick="refreshData()">تحديث البيانات</button>
-<button class="secondary" onclick="copyReport()">نسخ التقرير كاملاً</button>
+<div class="section" id="compareSection">
+    <h2>🔍 Compare Another Account</h2>
+
+    <p class="note">
+        الصق هنا تقرير الحساب الآخر الذي نسخته سابقاً .
+        ستتم مقارنة جميع الخصائص الموجودة في التقريرين .
+    </p>
+
+    <textarea id="compareInput"
+        placeholder="Paste the other account JSON report here..."></textarea>
+
+    <button onclick="compareReports()">مقارنة التقريرين</button>
+
+    <div id="compareResult" hidden>
+        <div class="stats">
+            <div class="stat">
+                <strong class="same" id="sameCount">0</strong>
+                <span>متطابق</span>
+            </div>
+            <div class="stat">
+                <strong class="different" id="differentCount">0</strong>
+                <span>مختلف</span>
+            </div>
+            <div class="stat">
+                <strong class="missing" id="missingCount">0</strong>
+                <span>ناقص</span>
+            </div>
+        </div>
+
+        <label class="note" for="filter">تصفية النتائج :</label>
+        <select id="filter" onchange="renderComparison()">
+            <option value="all">جميع الخصائص</option>
+            <option value="different">الخصائص المختلفة</option>
+            <option value="same">الخصائص المتطابقة</option>
+            <option value="missing">الخصائص الناقصة</option>
+        </select>
+
+        <div id="comparisonList"></div>
+    </div>
+</div>
 
 <footer>
     Device Inspector · Diagnostic Tool
@@ -156,27 +339,30 @@ footer {
 
 <script>
 const tg = window.Telegram?.WebApp;
+let report = null;
+let comparison = [];
 
-function value(v) {
-    if (v === undefined || v === null || v === "")
-        return "غير متاح";
-    return String(v);
-}
+function cleanTelegramData(data) {
+    if (!data) return null;
 
-function add(container, name, val) {
-    const item = document.createElement("div");
-    item.className = "item";
+    const user = data.user || null;
 
-    const key = document.createElement("div");
-    key.className = "key";
-    key.textContent = name;
+    return {
+        user: user ? {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            username: user.username,
+            language_code: user.language_code,
+            is_premium: user.is_premium,
+            allows_write_to_pm: user.allows_write_to_pm
+        } : null,
 
-    const data = document.createElement("div");
-    data.className = "value";
-    data.textContent = value(val);
-
-    item.append(key, data);
-    container.appendChild(item);
+        chat_type: data.chat_type,
+        chat_instance: data.chat_instance,
+        start_param: data.start_param,
+        can_send_after: data.can_send_after
+    };
 }
 
 function getWebGL() {
@@ -185,22 +371,32 @@ function getWebGL() {
         const gl = canvas.getContext("webgl") ||
                    canvas.getContext("experimental-webgl");
 
-        if (!gl) return {};
+        if (!gl) return { available: false };
 
         const ext = gl.getExtension("WEBGL_debug_renderer_info");
 
         return {
-            vendor: ext ?
-                gl.getParameter(ext.UNMASKED_VENDOR_WEBGL) :
-                gl.getParameter(gl.VENDOR),
+            available: true,
+            vendor: ext
+                ? gl.getParameter(ext.UNMASKED_VENDOR_WEBGL)
+                : gl.getParameter(gl.VENDOR),
 
-            renderer: ext ?
-                gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) :
-                gl.getParameter(gl.RENDERER),
+            renderer: ext
+                ? gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)
+                : gl.getParameter(gl.RENDERER),
 
             version: gl.getParameter(gl.VERSION),
+
             shadingLanguage: gl.getParameter(
                 gl.SHADING_LANGUAGE_VERSION
+            ),
+
+            maxTextureSize: gl.getParameter(
+                gl.MAX_TEXTURE_SIZE
+            ),
+
+            maxViewportDims: gl.getParameter(
+                gl.MAX_VIEWPORT_DIMS
             )
         };
     } catch (e) {
@@ -261,21 +457,33 @@ function collect() {
             viewportHeight: tg.viewportHeight,
             viewportStableHeight: tg.viewportStableHeight,
             headerColor: tg.headerColor,
-            backgroundColor: tg.backgroundColor,
-            initDataUnsafe: tg.initDataUnsafe
+            backgroundColor: tg.backgroundColor
         } : null,
 
-        initData: tg?.initData || null,
+        telegramUser: cleanTelegramData(
+            tg?.initDataUnsafe
+        ),
 
         environment: {
             timezone: Intl.DateTimeFormat()
                 .resolvedOptions().timeZone,
+
             timezoneOffset: new Date().getTimezoneOffset(),
-            date: new Date().toString(),
+
             localStorage: (() => {
                 try {
                     localStorage.setItem("__test", "1");
                     localStorage.removeItem("__test");
+                    return true;
+                } catch {
+                    return false;
+                }
+            })(),
+
+            sessionStorage: (() => {
+                try {
+                    sessionStorage.setItem("__test", "1");
+                    sessionStorage.removeItem("__test");
                     return true;
                 } catch {
                     return false;
@@ -285,54 +493,263 @@ function collect() {
     };
 }
 
-let report;
+function add(container, key, val) {
+    const item = document.createElement("div");
+    item.className = "item";
 
-function section(id, data) {
-    const el = document.getElementById(id);
-    const title = el.querySelector("h2");
-    el.replaceChildren(title);
+    const str = typeof val === "object"
+        ? JSON.stringify(val)
+        : String(val ?? "غير متاح");
 
-    for (const [key, val] of Object.entries(data))
-        add(el, key, Array.isArray(val) ? val.join(", ") : val);
+    if (str.length > 65 || key.toLowerCase().includes("useragent"))
+        item.classList.add("long");
+
+    const name = document.createElement("div");
+    name.className = "key";
+    name.textContent = key;
+
+    const value = document.createElement("div");
+    value.className = "value";
+    value.textContent = str;
+
+    item.append(name, value);
+    container.appendChild(item);
+}
+
+function renderSection(id, data) {
+    const section = document.getElementById(id);
+    const grid = section.querySelector(".data-grid");
+    grid.replaceChildren();
+
+    for (const [key, val] of Object.entries(data || {})) {
+        add(grid, key, val);
+    }
 }
 
 function refreshData() {
     report = collect();
 
-    section("device", report.device);
-    section("browser", report.browser);
-    section("screen", report.screen);
-    section("webgl", report.webgl);
+    renderSection("device", report.device);
+    renderSection("browser", report.browser);
+    renderSection("screen", report.screen);
+    renderSection("webgl", report.webgl);
+    renderSection("telegram", report.telegram || {});
+    renderSection("environment", report.environment);
 
-    section("telegram", {
-        platform: report.telegram?.platform,
-        version: report.telegram?.version,
-        colorScheme: report.telegram?.colorScheme,
-        isExpanded: report.telegram?.isExpanded,
-        viewportHeight: report.telegram?.viewportHeight,
-        viewportStableHeight: report.telegram?.viewportStableHeight,
-        headerColor: report.telegram?.headerColor,
-        backgroundColor: report.telegram?.backgroundColor
-    });
+    document.getElementById("userData").textContent =
+        JSON.stringify(report.telegramUser || {}, null, 2);
 
-    document.getElementById("initData").textContent =
-        JSON.stringify(report.telegram?.initDataUnsafe || {}, null, 2);
-
-    document.getElementById("rawData").textContent =
-        report.initData || "غير متاح";
+    document.getElementById("compareResult").hidden = true;
 }
 
-function copyReport() {
+async function copyReport() {
     if (!report) refreshData();
 
     const text = JSON.stringify(report, null, 2);
 
-    if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(text)
-            .then(() => alert("تم نسخ التقرير"))
-            .catch(() => alert("تعذر النسخ"));
-    } else {
-        alert("خاصية النسخ غير مدعومة في هذه البيئة");
+    try {
+        await navigator.clipboard.writeText(text);
+        alert("تم نسخ التقرير بنجاح");
+    } catch {
+        const temp = document.createElement("textarea");
+        temp.value = text;
+        document.body.appendChild(temp);
+        temp.select();
+
+        const success = document.execCommand("copy");
+        temp.remove();
+
+        alert(success ? "تم نسخ التقرير" : "تعذر النسخ");
+    }
+}
+
+/* تحويل التقرير إلى مسارات قابلة للمقارنة */
+
+function flatten(obj, prefix = "", result = {}) {
+    if (obj === null || typeof obj !== "object") {
+        result[prefix] = obj;
+        return result;
+    }
+
+    const entries = Object.entries(obj);
+
+    if (!entries.length) {
+        result[prefix] = {};
+        return result;
+    }
+
+    for (const [key, val] of entries) {
+        const path = prefix ? prefix + "." + key : key;
+        flatten(val, path, result);
+    }
+
+    return result;
+}
+
+function stableStringify(value) {
+    if (value === null || typeof value !== "object")
+        return JSON.stringify(value);
+
+    if (Array.isArray(value))
+        return "[" + value.map(stableStringify).join(",") + "]";
+
+    const keys = Object.keys(value).sort();
+
+    return "{" + keys.map(key =>
+        JSON.stringify(key) + ":" + stableStringify(value[key])
+    ).join(",") + "}";
+}
+
+function formatValue(value) {
+    if (value === undefined) return "غير موجود";
+    if (value === null) return "null";
+
+    if (typeof value === "object")
+        return JSON.stringify(value);
+
+    return String(value);
+}
+
+function compareReports() {
+    if (!report) refreshData();
+
+    const input = document.getElementById("compareInput").value.trim();
+
+    if (!input) {
+        alert("الصق تقرير الحساب الآخر أولاً");
+        return;
+    }
+
+    let other;
+
+    try {
+        other = JSON.parse(input);
+    } catch {
+        alert("التقرير غير صالح . تأكد من نسخ JSON كاملاً");
+        return;
+    }
+
+    if (!other || typeof other !== "object" ||
+        !other.device || !other.browser) {
+        alert("هذا الملف لا يبدو تقرير Device Inspector صالحاً");
+        return;
+    }
+
+    const first = flatten(report);
+    const second = flatten(other);
+
+    const paths = new Set([
+        ...Object.keys(first),
+        ...Object.keys(second)
+    ]);
+
+    comparison = [];
+
+    for (const path of paths) {
+        const hasFirst = Object.hasOwn(first, path);
+        const hasSecond = Object.hasOwn(second, path);
+
+        let status;
+
+        if (!hasFirst || !hasSecond) {
+            status = "missing";
+        } else if (
+            stableStringify(first[path]) ===
+            stableStringify(second[path])
+        ) {
+            status = "same";
+        } else {
+            status = "different";
+        }
+
+        comparison.push({
+            path,
+            status,
+            first: first[path],
+            second: second[path]
+        });
+    }
+
+    const counts = {
+        same: comparison.filter(x => x.status === "same").length,
+        different: comparison.filter(x => x.status === "different").length,
+        missing: comparison.filter(x => x.status === "missing").length
+    };
+
+    document.getElementById("sameCount").textContent = counts.same;
+    document.getElementById("differentCount").textContent = counts.different;
+    document.getElementById("missingCount").textContent = counts.missing;
+
+    document.getElementById("compareResult").hidden = false;
+
+    renderComparison();
+
+    document.getElementById("compareResult")
+        .scrollIntoView({ behavior: "smooth" });
+}
+
+function renderComparison() {
+    const filter = document.getElementById("filter").value;
+    const list = document.getElementById("comparisonList");
+
+    list.replaceChildren();
+
+    const filtered = comparison.filter(item =>
+        filter === "all" || item.status === filter
+    );
+
+    if (!filtered.length) {
+        list.textContent = "لا توجد نتائج في هذا التصنيف";
+        return;
+    }
+
+    for (const item of filtered) {
+        const card = document.createElement("div");
+        card.className = "diff-item";
+
+        const name = document.createElement("div");
+        name.className = "diff-name";
+        name.textContent = item.path;
+
+        const status = document.createElement("div");
+        status.className = item.status;
+
+        status.textContent = {
+            same: "✓ متطابق",
+            different: "≠ مختلف",
+            missing: "⚠ خاصية ناقصة في أحد التقريرين"
+        }[item.status];
+
+        const values = document.createElement("div");
+        values.className = "diff-values";
+
+        const first = document.createElement("div");
+        first.className = "diff-value";
+
+        const firstLabel = document.createElement("div");
+        firstLabel.className = "diff-label";
+        firstLabel.textContent = "التقرير الأول";
+
+        const firstValue = document.createElement("div");
+        firstValue.textContent = formatValue(item.first);
+
+        first.append(firstLabel, firstValue);
+
+        const second = document.createElement("div");
+        second.className = "diff-value";
+
+        const secondLabel = document.createElement("div");
+        secondLabel.className = "diff-label";
+        secondLabel.textContent = "التقرير الثاني";
+
+        const secondValue = document.createElement("div");
+        secondValue.textContent = formatValue(item.second);
+
+        second.append(secondLabel, secondValue);
+
+        values.append(first, second);
+        card.append(name, status, values);
+        list.appendChild(card);
     }
 }
 
